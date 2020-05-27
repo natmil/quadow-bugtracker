@@ -1,0 +1,45 @@
+{% extends "users/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <div class="card shadow-lg o-hidden border-0 my-5" style="margin: 0px -12px;">
+            <div class="card-body p-0">
+                <div class="row">
+                    <div class="col-lg-5 d-none d-lg-flex" style="width: 929;height: 673;">
+                        <div class="flex-grow-1 bg-register-image"
+                             style="background-image: url(&quot;{% static 'assets/img/banner_registro.webp' %}&quot;);"></div>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="p-5">
+                            {% if messages %}
+                                {% for mensaje in messages %}
+                                    <div class="alert alert-{{ mensaje.tags }}">
+                                        {{ mensaje }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="text-center">
+                                <h4 class="text-dark mb-4">Crear una cuenta</h4>
+                            </div>
+                            <form method="POST" class="user">
+                                {% csrf_token %}
+                                {{ formulario|crispy }}
+                                <button class="btn btn-primary btn-block text-white btn-user" type="submit">Registrar
+                                </button>
+                                <hr>
+                            </form>
+                            <div class="text-center"><a class="small" href="{% url 'password_reset' %}"><br>¿Has
+                                olvidado la
+                                contraseña?<br></a></div>
+                            <div class="text-center"><a class="small" href="{% url 'login' %}">¿Ya tienes una cuenta?
+                                Inicia
+                                sesión</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

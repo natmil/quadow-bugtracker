@@ -1,0 +1,71 @@
+{% extends "tracker/base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="container-fluid">
+        <h3 class="text-dark mb-4">Proyectos</h3>
+        <!-- DataTales Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <span class="m-0 font-weight-bold text-primary">Lista de proyectos</span>
+                <div class="fa-pull-right">
+                    <a class="btn btn-primary btn-sm" href="{% url 'crear-proyecto' %}">Nuevo proyecto</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Fecha creación</th>
+                            <th>Creado por</th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Fecha creación</th>
+                            <th>Creado por</th>
+                        </tr>
+                        </tfoot>
+                        <tbody>
+                        {% for proyecto in proyectos %}
+                            {# Enlace de la columna con el id del proyecto #}
+                            <tr class='clic-columna' data-href='{% url 'detalle-proyecto' proyecto.id %}'>
+
+
+                                {# Cortar texto por longitud #}
+                                {% if proyecto.nombre|length > 30 %}
+                                    <td style="width: 30%"><img class="rounded-circle mr-2" width="30" height="30"
+                                                                src="{{ proyecto.imagen.url }}"> {{ proyecto.nombre|slice:":30" }}...
+                                    </td>
+                                {% else %}
+                                    <td style="width: 30%"><img class="rounded-circle mr-2" width="30" height="30"
+                                                                src="{{ proyecto.imagen.url }}"> {{ proyecto.nombre }}
+                                    </td>
+                                {% endif %}
+
+                                {% if proyecto.descripcion|length > 50 %}
+                                    <td style="width: 35%">{{ proyecto.descripcion|slice:":50" }}...</td>
+                                {% else %}
+                                    <td style="width: 35%">{{ proyecto.descripcion }}</td>
+                                {% endif %}
+                                <td style="width: 20%">{{ proyecto.fecha_creacion|date:"d b Y - H:i" }}</td>
+                                <td style="width: 15%">
+                                    <img class="rounded-circle mr-2" width="30" height="30"
+                                         src="{{ proyecto.usuario_creador.perfil.imagen.url }}">{{ proyecto.usuario_creador.first_name }} {{ proyecto.usuario_creador.last_name }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

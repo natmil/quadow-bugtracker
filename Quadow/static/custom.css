@@ -1,0 +1,21 @@
+.rounded-circle {
+    object-fit: cover;
+}
+
+tr.clic-columna:hover {
+    background-color: #f5f4f5;
+    cursor: pointer;
+}
+
+tr.clic-columna:active {
+    color: white;
+    background-color: #4e73df;
+}
+
+.custom-select {
+    width: 100%;
+}
+
+.custom-file {
+    margin-bottom: 3%;
+}

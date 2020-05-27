@@ -1,0 +1,22 @@
+{% extends "tracker/base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="container-fluid">
+        <h3 class="text-dark mb-4">Proyecto #{{ object.id }}<br></h3>
+        <div class="mb-3">
+            <form method="POST">
+                {% csrf_token %}
+                <fieldset class="form-group">
+                    <h2>¿Está seguro de que desea eliminar el proyecto <strong>{{ object.nombre }}</strong>?</h2>
+                    <h5>Esta opción no es reversible.</h5>
+                </fieldset>
+                <div class="form-group">
+                    <button class="btn btn-danger btn-sm" type="submit">Eliminar</button>
+                    <a class="btn btn-secondary btn-sm" href="{% url 'detalle-proyecto' object.id %}">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

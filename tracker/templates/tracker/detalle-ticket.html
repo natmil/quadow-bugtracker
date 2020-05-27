@@ -1,0 +1,261 @@
+{% extends "tracker/base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="container-fluid">
+        <h3 class="text-dark mb-4">Ticket #{{ ticket.id }} - {{ ticket.proyecto }}</h3>
+        <div class="row mb-3">
+            <div class="col">
+                <div class="card shadow mb-3">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <span class="text-primary m-0 font-weight-bold">Detalles</span>
+                        {% if ticket.usuario_creador == user or admins or proyect_managers %}
+                            <div class="dropdown no-arrow fa-pull-right">
+                                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                     aria-labelledby="dropdownMenuLink" x-placement="bottom-end">
+                                    <div class="dropdown-header">Opciones:</div>
+                                    <a class="dropdown-item"
+                                       href="{% url 'editar-ticket' ticket.proyecto.id ticket.id %}">Editar</a>
+                                    <a class="dropdown-item"
+                                       href="{% url 'eliminar-ticket' ticket.proyecto.id ticket.id %}">Eliminar</a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="form-row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <h6><strong>Título</strong></h6>
+                                    </div>
+                                    <p>{{ ticket.titulo }}</p>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <h6 class="font-weight-bold">Descripción</h6>
+                                    </div>
+                                    <p>{{ ticket.descripcion }}</p>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <h6><strong>Tipo</strong></h6>
+                                    </div>
+                                    <p>{{ ticket.get_tipo_display }}</p>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <h6 class="font-weight-bold">Prioridad</h6>
+                                    </div>
+                                    <p>{{ ticket.get_prioridad_display }}</p>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <h6><strong>Fecha creacion</strong></h6>
+                                    </div>
+                                    <p>{{ ticket.fecha_creacion }}</p>
+                                </div>
+                                <div class="col">
+
+                                    <div class="form-group">
+
+                                        <div class="dropdown no-arrow">
+                                            <span class="font-weight-bold">Estado</span>
+                                            {% if admins or proyect_managers %}
+                                                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i class="fas fa-exchange-alt fa-sm fa-fw text-gray-400"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                                     aria-labelledby="dropdownMenuLink" x-placement="bottom-end">
+                                                    <div class="dropdown-header">Cambiar estado:</div>
+                                                    {% if not ticket.estado == 0 %}
+                                                        <a class="dropdown-item"
+                                                           href="{% url 'cambiar-estado' ticket.proyecto.id ticket.id 0 %}">Abierto</a>
+                                                    {% endif %}
+                                                    {% if not ticket.estado == 1 %}
+                                                        <a class="dropdown-item"
+                                                           href="{% url 'cambiar-estado' ticket.proyecto.id ticket.id 1 %}">Pendiente</a>
+                                                    {% endif %}
+                                                    {% if not ticket.estado == 2 %}
+                                                        <a class="dropdown-item"
+                                                           href="{% url 'cambiar-estado' ticket.proyecto.id ticket.id 2 %}">Resuelto</a>
+                                                    {% endif %}
+                                                    {% if not ticket.estado == 3 %}
+                                                        <a class="dropdown-item"
+                                                           href="{% url 'cambiar-estado' ticket.proyecto.id ticket.id 3 %}">Cerrado</a>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <p>{{ ticket.get_estado_display }}</p>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <h6><strong>Creado por</strong></h6>
+                                    </div>
+                                    <img class="border rounded-circle img-profile" width="30" height="30"
+                                         src="{{ ticket.usuario_creador.perfil.imagen.url }}">
+                                    {{ ticket.usuario_creador.get_full_name }}
+                                    {% if ticket.usuario_creador == user or admins or proyect_managers %}
+                                        <!--
+                                        <div class="fa-pull-right">
+                                            <a class="btn btn-danger btn-sm"
+                                               href="{% url 'eliminar-ticket' ticket.proyecto.id ticket.id %}">Eliminar
+                                                ticket</a>
+                                        </div>
+                                        -->
+                                    {% endif %}
+                                </div>
+
+
+                            </div>
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-lg-4">
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <p class="text-primary m-0 font-weight-bold">Adjuntos</p>
+                    </div>
+                    <div class="card-body">
+                        {% for adjunto in adjuntos %}
+                            <p><strong>
+                                <img class="border rounded-circle img-profile" width="30" height="30"
+                                     src="{{ adjunto.autor.perfil.imagen.url }}">
+                                {{ adjunto.autor.get_full_name }}:</strong>
+                                {% if adjunto.fichero.name|length > 30 %}
+                                    <a href="{{ adjunto.fichero.url }}"
+                                       title="{{ adjunto.fichero.name|slice:"9:" }}">{{ adjunto.fichero.name|slice:"9:30" }}...</a>
+                                {% else %}
+                                    <a href="{{ adjunto.fichero.url }}">{{ adjunto.fichero.name|slice:"9:" }}</a>
+                                {% endif %}
+                            </p>
+                            <hr>
+                        {% empty %}
+                            <p>No hay adjuntos, lo sentimos.</p>
+                        {% endfor %}
+
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" name="fichero"
+                                       id="id_fichero" {% if ticket.estado == 3 %} disabled {%endif%}>
+                                <label class="custom-file-label" for="customFile">Elegir fichero</label>
+                            </div>
+                            <button class="btn btn-primary btn-sm" name="subir_adjunto" type="submit" {% if ticket.estado == 3 %} disabled {%endif%}>Subir</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="row mb-3 d-none">
+                    <div class="col">
+                        <div class="card text-white bg-primary shadow">
+                            <div class="card-body">
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        <p class="m-0">Peformance</p>
+                                        <p class="m-0"><strong>65.2%</strong></p>
+                                    </div>
+                                    <div class="col-auto"><i class="fas fa-rocket fa-2x"></i></div>
+                                </div>
+                                <p class="text-white-50 small m-0"><i class="fas fa-arrow-up"></i>&nbsp;5% since last
+                                    month</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card text-white bg-success shadow">
+                            <div class="card-body">
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        <p class="m-0">Peformance</p>
+                                        <p class="m-0"><strong>65.2%</strong></p>
+                                    </div>
+                                    <div class="col-auto"><i class="fas fa-rocket fa-2x"></i></div>
+                                </div>
+                                <p class="text-white-50 small m-0"><i class="fas fa-arrow-up"></i>&nbsp;5% since last
+                                    month</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow mb-5">
+            <div class="card-header py-3">
+                <p class="text-primary m-0 font-weight-bold">Comentarios</p>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="form-group"><label for="signature"><strong>Añadir un
+                                comentario</strong><br></label><textarea class="form-control" rows="4"
+                                                                         name="texto" {% if ticket.estado == 3 %} disabled {%endif%}></textarea></div>
+                            <div class="form-group">
+                                <div class="custom-control custom-switch"><input class="custom-control-input"
+                                                                                 type="checkbox" id="formCheck-1"
+                                                                                 disabled><label
+                                        class="custom-control-label" for="formCheck-1"><strong>Notificarme ante nuevos
+                                    comentarios</strong></label></div>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary btn-sm" name="comentar_ticket" type="submit" {% if ticket.estado == 3 %} disabled {%endif%}>Enviar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col">
+                        {% for comentario in comentarios %}
+                            <form method="POST">
+                                {% csrf_token %}
+                                {% if comentario.autor == user or admins or proyect_managers or user.is_superuser %}
+                                    <div class="fa-pull-right">
+                                        <button class="btn btn-outline-danger btn-sm" name="comentario"
+                                                type="submit" value="{{ comentario.id }}">Eliminar
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </form>
+                            <strong>
+                                <p>
+                                    <img class="border rounded-circle img-profile" width="30" height="30"
+                                         src="{{ comentario.autor.perfil.imagen.url }}">
+                                    {{ comentario.autor.get_full_name }}:
+                                </p>
+                            </strong>
+                            <p>
+                                {{ comentario.texto }}
+                            </p>
+                            <small>Publicado el {{ comentario.fecha_creacion|date:"d b Y - H:i" }}</small>
+                            {% if not forloop.last %}
+                                <hr>
+                            {% endif %}
+                        {% empty %}
+                            <p>No hay comentarios, lo sentimos.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

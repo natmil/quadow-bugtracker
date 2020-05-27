@@ -1,0 +1,223 @@
+{% extends "tracker/base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="container-fluid">
+        <h3 class="text-dark mb-4">Proyecto #{{ proyecto.id }}<br></h3>
+        <div class="row mb-3">
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col">
+                        <div class="card shadow mb-3">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <span class="text-primary m-0 font-weight-bold">Detalles</span>
+                                {% if proyecto.usuario_creador == user or admins or proyect_managers or user.is_superuser %}
+                                    <div class="dropdown no-arrow">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                             aria-labelledby="dropdownMenuLink" x-placement="bottom-end">
+                                            <div class="dropdown-header">Opciones:</div>
+                                            {% if proyecto.estado == 'ACTIVO' %}
+                                                <a class="dropdown-item"
+                                                   href="{% url 'cambiar-estado-proyecto' proyecto.id %}">Finalizar
+                                                    proyecto</a>
+                                            {% elif proyecto.estado == 'FINALIZADO' %}
+                                                <a class="dropdown-item"
+                                                   href="{% url 'cambiar-estado-proyecto' proyecto.id %}">Activar
+                                                    proyecto</a>
+                                            {% endif %}
+                                            <a class="dropdown-item" href="{% url 'editar-proyecto' proyecto.id %}">Editar</a>
+                                            <a class="dropdown-item" href="{% url 'eliminar-proyecto' proyecto.id %}">Eliminar</a>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="form-row">
+                                        <div class="col">
+                                            <h6 class="font-weight-bold">Nombre</h6>
+                                            <p class="text-break">{{ proyecto.nombre }}</p>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <h6 class="font-weight-bold">Descripción</h6>
+                                            </div>
+                                            <p class="text-break text-left">{{ proyecto.descripcion }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <h6 class="font-weight-bold">Fecha creación</h6>
+                                            </div>
+                                            <p class="text-break">{{ proyecto.fecha_creacion }}</p>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <h6 class="font-weight-bold">Estado</h6>
+                                            </div>
+                                            <p class="text-break">{{ proyecto.estado.capitalize }}</p>
+                                        </div>
+
+                                    </div>
+                                    {% if proyecto.usuario_creador == user or admins or proyect_managers %}
+                                        <!--
+                                        <div class="fa-pull-right">
+                                            <button class="btn btn-primary btn-sm" type="button">Editar</button>
+                                            <a class="btn btn-danger btn-sm"
+                                               href="{% url 'eliminar-proyecto' proyecto.id %}">Eliminar
+                                                proyecto</a>
+                                        </div>
+                                        -->
+                                    {% endif %}
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card shadow" style="margin: 0px 0px 16px;">
+                            <div class="card-header py-3">
+                                <span class="text-primary m-0 font-weight-bold">Tickets</span>
+                                <div class="fa-pull-right">
+                                    <a class="btn btn-primary btn-sm" href="{% url 'abrir-ticket' proyecto.id %}">Abrir
+                                        ticket</a>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive table mt-2" id="dataTable-1" role="grid"
+                                     aria-describedby="dataTable_info">
+                                    <table class="table dataTable my-0" id="dataTable">
+                                        <thead>
+                                        <tr>
+                                            <th>Título</th>
+                                            <th>Creado por</th>
+                                            <th>Tipo</th>
+                                            <th>Prioridad</th>
+                                            <th>Estado</th>
+                                            <th>Fecha creación</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for ticket in tickets %}
+                                            <tr class='clic-columna' data-href='./ticket/{{ ticket.id }}'>
+                                                <td>{{ ticket.titulo }}</td>
+                                                <td><img class="border rounded-circle img-profile" width="30"
+                                                         height="30"
+                                                         src="{{ ticket.usuario_creador.perfil.imagen.url }}">
+                                                    {{ ticket.usuario_creador.get_full_name }}
+                                                </td>
+                                                <td>{{ ticket.tipo|title }}</td>
+                                                <td>{{ ticket.get_prioridad_display }}</td>
+                                                <td>{{ ticket.get_estado_display }}</td>
+                                                <td>{{ ticket.fecha_creacion|date:"d b Y - H:i" }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                        <tr>
+                                            <td><strong>Título</strong></td>
+                                            <td><strong>Creado por</strong></td>
+                                            <td><strong>Tipo</strong></td>
+                                            <td><strong>Prioridad</strong></td>
+                                            <td><strong>Estado</strong></td>
+                                            <td><strong>Fecha creación</strong></td>
+                                        </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card mb-3">
+                    <div class="card-body text-center shadow"><img class="rounded-circle mb-3 mt-4" id="imagen_auto"
+                                                                   src="{{ proyecto.imagen.url }}"
+                                                                   width="160" height="160">
+                        <div class="mb-3">
+                            {% if proyecto.usuario_creador == user or admins or proyect_managers or user.is_superuser %}
+                                <form method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="custom-file">
+                                        <input type="file" accept="image/*" class="custom-file-input" name="imagen"
+                                               id="id_imagen" onchange="cambiarImagen(event)">
+                                        <label class="custom-file-label" for="customFile">Elegir imagen</label>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm" name="cambiar_imagen" type="submit">Cambiar
+                                        imagen
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <span class="text-primary font-weight-bold m-0">Personal asignado</span>
+                        {% if comentario.autor == user or admins or proyect_managers or user.is_superuser %}
+                            <div class="fa-pull-right">
+                                <button type="button" class="btn btn-primary btn-sm"
+                                        onclick="location.href='{% url 'roles-proyecto' proyecto.id %}';"><a
+                                        class="text-white text-decoration-none fa fa-plus"></a></button>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive table mt-2" id="dataTable-1" role="grid"
+                             aria-describedby="dataTable_info">
+                            <table class="table dataTable my-0 display" id="dataTable">
+                                <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Rol</th>
+                                    {% if comentario.autor == user or admins or proyect_managers or user.is_superuser %}
+                                        <th>Eliminar</th>
+                                    {% endif %}
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for rol in roles %}
+                                    <tr>
+                                        <td><img class="rounded-circle mr-2" width="30" height="30"
+                                                 src="{{ rol.usuario.perfil.imagen.url }}">{{ rol.usuario.get_full_name }}
+                                        </td>
+                                        <td>{{ rol.get_tipo_display }}</td>
+                                        {% if comentario.autor == user or admins or proyect_managers or user.is_superuser %}
+                                            <td>
+                                                <form method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="d-flex justify-content-center">
+                                                        <button type="submit"
+                                                                class="btn btn-outline-danger btn-sm"
+                                                                value="{{ rol.id }}" name="eliminar_rol">
+                                                            <a class="text-decoration-none fa fa-minus"></a>
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td><strong>Nombre</strong></td>
+                                    <td><strong>Rol</strong></td>
+                                    {% if comentario.autor == user or admins or proyect_managers or user.is_superuser %}
+                                        <th>Eliminar</th>
+                                    {% endif %}
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

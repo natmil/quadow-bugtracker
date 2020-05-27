@@ -1,0 +1,50 @@
+{% extends "users/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-9 col-lg-12 col-xl-10">
+                <div class="card shadow-lg o-hidden border-0 my-5">
+                    <div class="card-body p-0">
+                        <div class="row">
+                            <div class="col-lg-6 d-none d-lg-flex">
+                                <div class="flex-grow-1 bg-login-image"
+                                     style="background-image: url(&quot;{% static 'assets/img/banner_registro.webp' %}&quot;);"></div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="p-5">
+                                    {% if messages %}
+                                        {% for mensaje in messages %}
+                                            <div class="alert alert-{{ mensaje.tags }}">
+                                                {{ mensaje }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                    <div class="text-center">
+                                        <h4 class="text-dark mb-4">Bienvenido a Quadow</h4>
+                                    </div>
+                                    <form method="POST" class="user">
+                                        {% csrf_token %}
+                                        {{ form|crispy }}
+                                        <button class="btn btn-primary btn-block text-white btn-user" type="submit">
+                                            Iniciar sesión
+                                        </button>
+                                        <hr>
+                                    </form>
+                                    <div class="text-center"><a class="small" href="{% url 'password_reset' %}">¿Has
+                                        olvidado
+                                        la contraseña?</a></div>
+                                    <div class="text-center"><a class="small" href="{% url 'registro' %}">Crear una
+                                        cuenta</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
