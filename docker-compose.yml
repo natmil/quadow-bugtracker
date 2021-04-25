@@ -1,0 +1,43 @@
+version: '3'
+volumes:
+  pgdata:
+services:
+  python: &python
+    build:
+      context: .
+      dockerfile: docker/dev/python/Dockerfile
+    restart: always
+    volumes:
+      - ./quadow:/quadow
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:13.2
+    restart: always
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: $DATABASE_USER
+      POSTGRES_DB: $DATABASE_NAME
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  minio:
+    image: minio/minio
+    ports:
+      - 9000:9000
+    env_file:
+      - .env
+    environment:
+      - MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY
+      - MINIO_SECRET_KEY=$MINIO_SECRET_KEY
+    command: server /data
+    volumes:
+      - ~/docker/minio-data:/data

@@ -1,4 +1,6 @@
 /media/
-/Quadow/datos.py
+/quadow/datos.py
 /venv
 .idea/*
+
+.env

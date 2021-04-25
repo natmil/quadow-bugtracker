@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Quadow.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'quadow.settings')
 
 application = get_wsgi_application()
