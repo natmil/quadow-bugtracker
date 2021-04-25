@@ -1,5 +1,5 @@
 FROM python:3.9.2-slim-buster
-MAINTAINER logurbate@localhost
+MAINTAINER quadow@localhost
 
 COPY ./docker/dev/python/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
