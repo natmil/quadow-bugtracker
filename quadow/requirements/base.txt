@@ -1,7 +1,7 @@
 asgiref==3.3.4
 boto3==1.17.57
 botocore==1.20.57
-Django==3.0.14
+Django==3.1.13
 django-crispy-forms==1.11.2
 django-storages==1.11.1
 jmespath==0.10.0
